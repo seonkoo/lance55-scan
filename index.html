@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>55战法扫盘 · 兰斯洛t</title>
+<style>
+:root{
+  --bg:#f5f6f8; --card:#fff; --line:#e5e7eb; --txt:#1f2328; --sub:#6b7280;
+  --up:#e02020; --down:#0a9d4e; --hot:#e8500f; --blue:#2563eb; --amber:#d97706;
+  --soft:#f0f2f5;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:16px 14px 60px}
+h1{font-size:20px;margin:0 0 2px}
+.sub{color:var(--sub);font-size:12px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.env{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.env .tag{font-weight:700;font-size:15px;padding:3px 10px;border-radius:8px;background:var(--soft)}
+.env .tag.weak{color:var(--down)}.env .tag.mid{color:var(--amber)}.env .tag.strong{color:var(--up)}
+.env .desc{color:var(--sub);font-size:13px;flex:1 1 320px}
+.env .num{font-variant-numeric:tabular-nums;font-size:13px;color:var(--sub)}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.pill{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer;user-select:none}
+.pill.on{border-color:var(--txt);font-weight:700}
+.pill b{font-variant-numeric:tabular-nums}
+.pill.hot.on{background:#fff3ec;border-color:var(--hot);color:var(--hot)}
+.pill.warn.on{background:#fff8e6;border-color:var(--amber);color:var(--amber)}
+.pill.watch.on{background:#eef2ff;border-color:var(--blue);color:var(--blue)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 13px;position:relative}
+.item.today{border-left:4px solid var(--hot)}
+.item.recent{border-left:4px solid var(--amber)}
+.item.watch{border-left:4px solid var(--blue)}
+.hd{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.hd .nm{font-size:16px;font-weight:700}
+.hd .cd{color:var(--sub);font-size:12px;font-variant-numeric:tabular-nums}
+.hd .score{margin-left:auto;font-size:12px;background:var(--soft);border-radius:8px;padding:2px 7px;font-variant-numeric:tabular-nums}
+.row{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:7px;font-size:13px}
+.kv{color:var(--sub)}
+.kv b{color:var(--txt);font-weight:600;font-variant-numeric:tabular-nums}
+.up{color:var(--up)}.down{color:var(--down)}
+.chip{font-size:11.5px;padding:2px 7px;border-radius:6px;background:var(--soft);color:var(--sub)}
+.chip.a{background:#e8f5ee;color:var(--down)}
+.chip.b{background:#eef2ff;color:var(--blue)}
+.chip.c{background:#fdeaea;color:var(--up)}
+.line{height:1px;background:var(--line);margin:9px 0}
+.hint{font-size:12px;color:var(--sub);margin-top:6px;line-height:1.6}
+details{margin-top:6px}
+summary{cursor:pointer;font-size:13px;color:var(--blue);outline:none}
+.rule{font-size:13px;color:#374151;line-height:1.75}
+.rule code{background:var(--soft);padding:1px 5px;border-radius:4px;font-size:12px}
+.empty{color:var(--sub);padding:26px 10px;text-align:center;font-size:13px}
+.crumb{font-size:12px;color:var(--sub);margin:14px 0 6px;font-weight:600}
+table.par{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+table.par td{border-top:1px solid var(--line);padding:4px 6px;color:var(--sub)}
+table.par td:last-child{text-align:right;color:var(--txt);font-variant-numeric:tabular-nums}
+.warnbar{background:#fff8e6;border:1px solid #f5d68a;color:#8a5a00;border-radius:10px;padding:9px 12px;font-size:12.5px;margin-bottom:12px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>55 战法扫盘 <span style="font-size:13px;font-weight:400;color:#6b7280">· 兰斯洛t</span></h1>
+  <div class="sub" id="gen">加载中…</div>
+
+  <div class="card"><div class="env" id="env"></div></div>
+  <div id="warn"></div>
+
+  <div class="stats" id="pills"></div>
+  <div class="grid" id="list"></div>
+
+  <div class="crumb">战法速查（兰神原话归纳）</div>
+  <div class="card">
+    <details open>
+      <summary>开仓 / 买点 / 卖点 / 止损</summary>
+      <div class="rule" style="margin-top:8px">
+        <b>① 前提</b>：<code>5/10/20 多头排列</code>（他原话：多头排列最重要，55 线都其次）<br>
+        <b>② 触发</b>：以<b>放量大阳K</b>突破日 55 线（跟个股自己均量比即可）<br>
+        <b>③ 买点</b>：突破后 <b>1~3 天内</b>（最好第 2 天，最多第 3 天）<br>
+        &nbsp;&nbsp;· <b>A 类</b>：开盘被快速向下击穿 55 线（大盘同步跌最好）→ <b>当天收回 55 线上最强</b><br>
+        &nbsp;&nbsp;· <b>B 类</b>：尾盘落在 55 线下且当天<b>缩量</b><br>
+        <b>④ 卖点（盈亏同源）</b>：在<b>上一级别 55 线</b>卖 —— 日线买 → 日 233 / 周 55；60 分买 → 日 55<br>
+        <b>⑤ 做 T</b>：优先 <b>15 分 55 线</b>，一次 T 1/3，别 T 飞底仓<br>
+        <b>⑥ 止损</b>：<b>凌驾于任何技术之上</b>。放量击穿 55 收不回来 → 减仓/清仓；超定量止损上限 → 直接跑<br>
+        <b>⑦ 环境</b>：大盘是最大趋势。大盘跌 + 个股跌时抄，胜率最高；大盘不企稳开仓赚不到钱
+      </div>
+    </details>
+    <details>
+      <summary>本次扫描参数（改 lance55_config.json 后重跑即可）</summary>
+      <table class="par" id="par"></table>
+    </details>
+    <div class="hint">
+      数据口径：腾讯前复权日线（含当日实时）× 沪深 A 股（不含北交所、ST、退市）。<br>
+      「A 类 / B 类」由日线近似判定：日线看不到分时速度，A 类仅表示<b>收盘收回 55 线上</b>。<br>
+      行业覆盖 <b id="indcov">-</b> 只（新浪行业板块接口只覆盖约六成，其余标"未分类"，不是数据缺失）。<br>
+      「回踩」判定含 <b>0.5% 容差</b>（最低价触及 MA55×1.005 即算）——所以请看「最低距55线」那一栏，
+      <b>负值=真击穿，正值=只是贴近</b>。标注 <b>C 类</b> 表示收盘落在 55 线下且<b>放量</b>（他原则里的减仓/离场信号），谨慎对待。<br>
+      高振幅(≥15%)、一字板、今日涨停的会单独标注——这些要么是妖股要么买不到，别当普通信号用。<br>
+      他自称的胜率(100%/78%)<b>未经独立验证</b>；此为观测与筛选工具，不构成投资建议。
+    </div>
+  </div>
+</div>
+
+<script>
+window.__DATA__={"meta": {"generated": "2026-09-16 23:09:24", "trade_date": "2026-09-16", "universe": 5219, "scanned": 5219, "industry_cover": 3009, "config": {"_说明": "55战法扫盘配置。改阈值只动这里，不用改 Python 源码。", "universe": {"exclude_bj": true, "exclude_name_keywords": ["ST", "退", "N "], "min_bars": 60, "min_amount_yi": 0.5, "max_price": 200}, "trend": {"bull_ma": [5, 10, 20], "signal_ma": 55, "target_ma": 233, "vol_ma": 5}, "breakout": {"_说明": "放量大阳突破日55线：前一日收盘在55线下，当日收盘站上，涨幅达标，量能达标", "min_gain_pct": 3.0, "min_vol_ratio": 1.5, "require_yang": true, "lookback_days": 3}, "pullback": {"_说明": "突破后1-3天内出现回踩：盘中击穿55线(low<=ma55*buf) 或 尾盘缩量落在55线下", "max_days_after": 3, "touch_buf": 0.005, "shrink_vol_ratio": 1.0, "max_close_below_pct": 3.0, "reclaim_bonus": true}, "risk": {"_说明": "止损：突破日最低价 与 ma55*(1-stop_below) 取更低者；定量止损优先于技术", "stop_below_ma55_pct": 3.0, "hard_stop_pct": 7.0, "max_chg20_pct": 80}, "scan": {"_说明": "rate 是全局每秒请求上限。实测 6 并发打到 ~50 req/s 会被腾讯 WAF 封 IP(501)，12 是安全线，别调高", "top_n": 80, "workers": 4, "rate": 12, "datalen": 320, "industry": true}}, "market": {"date": "2026-09-16", "close": 3891.6, "chg": 0.71, "ma5": 3892.74, "ma10": 3916.07, "ma20": 3923.5, "ma55": 3915.2, "tag": "弱势", "desc": "空头/55 线下：他明说『大盘不企稳开仓赚不到钱』，建议只观察"}, "logs": ["[23:08:35] === 55战法扫盘 开始 ===", "[23:09:14]   全A列表: 5219 只（沪深，已剔北交所），交易日=2026-09-16", "[23:09:16]   缓存命中率 100.0%（5219/5219），阈值 80%", "[23:09:16]   日线: 需拉取 0 只（缓存命中 5219 只），并发 4，限速 12 req/s", "[23:09:23]   缓存已写入 cache/klines_tx.json (5219 只)", "[23:09:23]   大盘环境: 上证 2026-09-16 弱势 (3891.60, +0.71%) 55线=3915.20", "[23:09:24]   扫描: 有效K线 5219 只 -> 命中(多头+突破55) 32 只，异常 0 只，用时 0.8s", "[23:09:24]   分级: 今日买点 6 / 窗口内已触发 1 / 待回踩观察 25", "[23:09:24]     🔥 600032 浙江新能  A-盘中击穿  距55线+1.92% 回踩量比0.72 分92.0", "[23:09:24]     🔥 603020 爱普股份  A-盘中击穿  距55线+0.98% 回踩量比0.85 分91.0", "[23:09:24]     🔥 002268 电科网安  C-放量破位(慎)  距55线-0.32% 回踩量比1.34 分89.0", "[23:09:24]     🔥 688150 莱特光电  A-盘中击穿  距55线+1.65% 回踩量比1.44 分81.0", "[23:09:24]     🔥 605069 正和生态  A-盘中击穿  距55线+14.04% 回踩量比2.68 分61.0", "[23:09:24]     🔥 301263 泰恩康  C-放量破位(慎)  距55线-2.11% 回踩量比1.27 分60.0"]}, "buy_today": [{"code": "600032", "name": "浙江新能", "symbol": "sh600032", "amplitude": 4.1, "low_vs_ma55_pct": 0.37, "one_word": false, "limit_up": false, "limit_down": false, "industry": "", "ind_perf": null, "price": 7.21, "chg": -0.28, "amount_yi": 2.41, "mktcap_yi": 173.4, "turnover": 1.39, "stage": "BUY_TODAY", "hit_kind": "A-盘中击穿", "hit_date": "2026-09-16", "hit_vol_ratio": 0.72, "reclaim": false, "break_date": "2026-09-11", "break_gain": 5.53, "break_vol_ratio": 5.09, "days_after": 3, "ma5": 7.234, "ma10": 7.029, "ma20": 6.926, "ma55": 7.074, "dist_ma55_pct": 1.92, "vol_ratio_today": 0.72, "chg20": 6.66, "stop_tech": 6.862, "stop_tech_pct": -4.83, "stop_hard": 6.705, "target_233": 8.231, "recent_high": 8.11, "score": 92.0, "last_date": "2026-09-16"}, {"code": "603020", "name": "爱普股份", "symbol": "sh603020", "amplitude": 3.1, "low_vs_ma55_pct": -0.42, "one_word": false, "limit_up": false, "limit_down": false, "industry": "食品行业", "ind_perf": 0.25607296325528, "price": 10.8, "chg": -0.18, "amount_yi": 1.26, "mktcap_yi": 40.6, "turnover": 3.09, "stage": "BUY_TODAY", "hit_kind": "A-盘中击穿", "hit_date": "2026-09-16", "hit_vol_ratio": 0.85, "reclaim": true, "break_date": "2026-09-14", "break_gain": 10.05, "break_vol_ratio": 1.67, "days_after": 2, "ma5": 10.654, "ma10": 10.552, "ma20": 10.337, "ma55": 10.695, "dist_ma55_pct": 0.98, "vol_ratio_today": 0.85, "chg20": 9.64, "stop_tech": 9.92, "stop_tech_pct": -8.15, "stop_hard": 10.044, "target_233": 10.804, "recent_high": 15.05, "score": 91.0, "last_date": "2026-09-16"}, {"code": "002268", "name": "电科网安", "symbol": "sz002268", "amplitude": 4.3, "low_vs_ma55_pct": -1.3, "one_word": false, "limit_up": false, "limit_down": false, "industry": "电子信息", "ind_perf": 2.5666924128097, "price": 14.17, "chg": -2.14, "amount_yi": 3.23, "mktcap_yi": 119.8, "turnover": 2.68, "stage": "BUY_TODAY", "hit_kind": "C-放量破位(慎)", "hit_date": "2026-09-16", "hit_vol_ratio": 1.34, "reclaim": false, "break_date": "2026-09-14", "break_gain": 5.56, "break_vol_ratio": 4.52, "days_after": 2, "ma5": 14.228, "ma10": 14.155, "ma20": 14.034, "ma55": 14.215, "dist_ma55_pct": -0.32, "vol_ratio_today": 1.34, "chg20": 4.73, "stop_tech": 13.789, "stop_tech_pct": -2.69, "stop_hard": 13.178, "target_233": 16.681, "recent_high": 15.9, "score": 89.0, "last_date": "2026-09-16"}, {"code": "688150", "name": "莱特光电", "symbol": "sh688150", "amplitude": 6.1, "low_vs_ma55_pct": -2.63, "one_word": false, "limit_up": false, "limit_down": false, "industry": "", "ind_perf": null, "price": 43.28, "chg": -0.21, "amount_yi": 5.31, "mktcap_yi": 174.2, "turnover": 3.09, "stage": "BUY_TODAY", "hit_kind": "A-盘中击穿", "hit_date": "2026-09-16", "hit_vol_ratio": 1.44, "reclaim": true, "break_date": "2026-09-15", "break_gain": 4.91, "break_vol_ratio": 2.06, "days_after": 1, "ma5": 41.048, "ma10": 39.694, "ma20": 39.328, "ma55": 42.578, "dist_ma55_pct": 1.65, "vol_ratio_today": 1.44, "chg20": 13.0, "stop_tech": 40.88, "stop_tech_pct": -5.55, "stop_hard": 40.25, "target_233": 38.186, "recent_high": 73.79, "score": 81.0, "last_date": "2026-09-16"}, {"code": "605069", "name": "正和生态", "symbol": "sh605069", "amplitude": 15.1, "low_vs_ma55_pct": 0.42, "one_word": false, "limit_up": false, "limit_down": false, "industry": "", "ind_perf": null, "price": 12.64, "chg": 2.27, "amount_yi": 3.1, "mktcap_yi": 26.8, "turnover": 12.14, "stage": "BUY_TODAY", "hit_kind": "A-盘中击穿", "hit_date": "2026-09-16", "hit_vol_ratio": 2.68, "reclaim": false, "break_date": "2026-09-11", "break_gain": 10.05, "break_vol_ratio": 2.45, "days_after": 3, "ma5": 11.92, "ma10": 11.289, "ma20": 10.958, "ma55": 11.084, "dist_ma55_pct": 14.04, "vol_ratio_today": 2.68, "chg20": 22.84, "stop_tech": 10.72, "stop_tech_pct": -15.19, "stop_hard": 11.755, "target_233": 12.193, "recent_high": 16.69, "score": 61.0, "last_date": "2026-09-16"}, {"code": "301263", "name": "泰恩康", "symbol": "sz301263", "amplitude": 4.8, "low_vs_ma55_pct": -2.4, "one_word": false, "limit_up": false, "limit_down": false, "industry": "", "ind_perf": null, "price": 19.62, "chg": -3.11, "amount_yi": 0.85, "mktcap_yi": 100.2, "turnover": 1.18, "stage": "BUY_TODAY", "hit_kind": "C-放量破位(慎)", "hit_date": "2026-09-16", "hit_vol_ratio": 1.27, "reclaim": false, "break_date": "2026-09-14", "break_gain": 3.9, "break_vol_ratio": 1.75, "days_after": 2, "ma5": 19.97, "ma10": 19.843, "ma20": 19.531, "ma55": 20.042, "dist_ma55_pct": -2.11, "vol_ratio_today": 1.27, "chg20": -0.25, "stop_tech": 19.44, "stop_tech_pct": -0.92, "stop_hard": 18.247, "target_233": 22.877, "recent_high": 22.76, "score": 60.0, "last_date": "2026-09-16"}], "buy_recent": [{"code": "300408", "name": "三环集团", "symbol": "sz300408", "amplitude": 3.8, "low_vs_ma55_pct": 6.99, "one_word": false, "limit_up": false, "limit_down": false, "industry": "电子器件", "ind_perf": 3.1363629167172, "price": 129.88, "chg": 2.91, "amount_yi": 60.83, "mktcap_yi": 2593.3, "turnover": 2.52, "stage": "BUY_RECENT", "hit_kind": "A-盘中击穿", "hit_date": "2026-09-14", "hit_vol_ratio": 1.45, "reclaim": false, "break_date": "2026-09-11", "break_gain": 5.66, "break_vol_ratio": 1.78, "days_after": 3, "ma5": 124.796, "ma10": 119.115, "ma20": 115.005, "ma55": 118.005, "dist_ma55_pct": 5.31, "vol_ratio_today": 0.83, "chg20": 18.5, "stop_tech": 114.465, "stop_tech_pct": -11.87, "stop_hard": 120.788, "target_233": 80.287, "recent_high": 180.35, "score": 53.0, "last_date": "2026-09-16"}], "watch": [{"code": "601112", "name": "振石股份", "symbol": "sh601112", "amplitude": 3.4, "low_vs_ma55_pct": 1.51, "one_word": false, "limit_up": false, "limit_down": false, "industry": "次新股", "ind_perf": 2.2389557225561, "price": 16.02, "chg": -1.72, "amount_yi": 1.47, "mktcap_yi": 278.8, "turnover": 5.02, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-11", "break_gain": 3.4, "break_vol_ratio": 3.98, "days_after": 3, "ma5": 15.994, "ma10": 15.742, "ma20": 15.567, "ma55": 15.516, "dist_ma55_pct": 3.25, "vol_ratio_today": 1.01, "chg20": 4.98, "stop_tech": 15.05, "stop_tech_pct": -6.05, "stop_hard": 14.899, "target_233": null, "recent_high": 18.56, "score": 71.0, "last_date": "2026-09-16"}, {"code": "600184", "name": "光电股份", "symbol": "sh600184", "amplitude": 5.5, "low_vs_ma55_pct": 10.53, "one_word": false, "limit_up": false, "limit_down": false, "industry": "玻璃行业", "ind_perf": 0.75163301219912, "price": 21.27, "chg": -3.89, "amount_yi": 12.78, "mktcap_yi": 123.9, "turnover": 10.28, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-11", "break_gain": 10.02, "break_vol_ratio": 3.05, "days_after": 3, "ma5": 20.424, "ma10": 19.256, "ma20": 18.557, "ma55": 18.728, "dist_ma55_pct": 13.57, "vol_ratio_today": 1.29, "chg20": 22.03, "stop_tech": 17.8, "stop_tech_pct": -16.31, "stop_hard": 19.781, "target_233": 20.131, "recent_high": 33.55, "score": 63.0, "last_date": "2026-09-16"}, {"code": "002560", "name": "通达股份", "symbol": "sz002560", "amplitude": 4.5, "low_vs_ma55_pct": 14.89, "one_word": false, "limit_up": false, "limit_down": false, "industry": "发电设备", "ind_perf": 0.19855574334306, "price": 7.44, "chg": -3.63, "amount_yi": 10.75, "mktcap_yi": 54.7, "turnover": 22.76, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-11", "break_gain": 10.08, "break_vol_ratio": 4.01, "days_after": 3, "ma5": 7.172, "ma10": 6.714, "ma20": 6.422, "ma55": 6.38, "dist_ma55_pct": 16.61, "vol_ratio_today": 1.67, "chg20": 21.57, "stop_tech": 6.11, "stop_tech_pct": -17.88, "stop_hard": 6.919, "target_233": 7.387, "recent_high": 8.62, "score": 63.0, "last_date": "2026-09-16"}, {"code": "300151", "name": "昌红科技", "symbol": "sz300151", "amplitude": 11.9, "low_vs_ma55_pct": 9.44, "one_word": false, "limit_up": false, "limit_down": false, "industry": "机械行业", "ind_perf": 1.9511883798986, "price": 20.58, "chg": 9.0, "amount_yi": 8.7, "mktcap_yi": 109.6, "turnover": 11.81, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-14", "break_gain": 15.33, "break_vol_ratio": 3.08, "days_after": 2, "ma5": 18.134, "ma10": 17.148, "ma20": 16.698, "ma55": 17.005, "dist_ma55_pct": 21.02, "vol_ratio_today": 1.84, "chg20": 32.69, "stop_tech": 15.87, "stop_tech_pct": -22.89, "stop_hard": 19.139, "target_233": 17.001, "recent_high": 27.78, "score": 61.0, "last_date": "2026-09-16"}, {"code": "603693", "name": "江苏新能", "symbol": "sh603693", "amplitude": 7.2, "low_vs_ma55_pct": 5.78, "one_word": false, "limit_up": false, "limit_down": false, "industry": "", "ind_perf": null, "price": 12.74, "chg": -3.78, "amount_yi": 3.69, "mktcap_yi": 113.6, "turnover": 3.24, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-11", "break_gain": 9.97, "break_vol_ratio": 5.93, "days_after": 3, "ma5": 12.562, "ma10": 11.933, "ma20": 11.598, "ma55": 11.883, "dist_ma55_pct": 7.21, "vol_ratio_today": 1.2, "chg20": 13.04, "stop_tech": 11.32, "stop_tech_pct": -11.15, "stop_hard": 11.848, "target_233": 13.196, "recent_high": 13.5, "score": 60.0, "last_date": "2026-09-16"}, {"code": "300537", "name": "广信材料", "symbol": "sz300537", "amplitude": 8.2, "low_vs_ma55_pct": 1.32, "one_word": false, "limit_up": false, "limit_down": false, "industry": "", "ind_perf": null, "price": 22.36, "chg": 4.44, "amount_yi": 5.55, "mktcap_yi": 46.3, "turnover": 16.84, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-15", "break_gain": 5.57, "break_vol_ratio": 3.4, "days_after": 1, "ma5": 20.682, "ma10": 20.224, "ma20": 20.064, "ma55": 20.765, "dist_ma55_pct": 7.68, "vol_ratio_today": 3.03, "chg20": 14.14, "stop_tech": 20.01, "stop_tech_pct": -10.51, "stop_hard": 20.795, "target_233": 23.931, "recent_high": 36.45, "score": 60.0, "last_date": "2026-09-16"}, {"code": "600410", "name": "华胜天成", "symbol": "sh600410", "amplitude": 4.8, "low_vs_ma55_pct": 5.44, "one_word": false, "limit_up": false, "limit_down": false, "industry": "电子信息", "ind_perf": 2.5666924128097, "price": 15.79, "chg": 0.64, "amount_yi": 19.46, "mktcap_yi": 173.1, "turnover": 11.24, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-11", "break_gain": 9.99, "break_vol_ratio": 2.15, "days_after": 3, "ma5": 15.31, "ma10": 14.903, "ma20": 14.338, "ma55": 14.539, "dist_ma55_pct": 8.6, "vol_ratio_today": 0.96, "chg20": 15.0, "stop_tech": 14.103, "stop_tech_pct": -10.68, "stop_hard": 14.685, "target_233": 19.795, "recent_high": 18.14, "score": 59.0, "last_date": "2026-09-16"}, {"code": "002669", "name": "康达新材", "symbol": "sz002669", "amplitude": 6.4, "low_vs_ma55_pct": 10.24, "one_word": false, "limit_up": false, "limit_down": false, "industry": "化工行业", "ind_perf": 2.0330139224148, "price": 14.17, "chg": -1.39, "amount_yi": 7.14, "mktcap_yi": 43.0, "turnover": 16.58, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-14", "break_gain": 10.0, "break_vol_ratio": 2.37, "days_after": 2, "ma5": 13.424, "ma10": 12.792, "ma20": 12.346, "ma55": 12.482, "dist_ma55_pct": 13.53, "vol_ratio_today": 1.95, "chg20": 17.11, "stop_tech": 12.107, "stop_tech_pct": -14.56, "stop_hard": 13.178, "target_233": 13.889, "recent_high": 18.83, "score": 59.0, "last_date": "2026-09-16"}, {"code": "300207", "name": "欣旺达", "symbol": "sz300207", "amplitude": 19.9, "low_vs_ma55_pct": -2.58, "one_word": false, "limit_up": false, "limit_down": false, "industry": "电子器件", "ind_perf": 3.1363629167172, "price": 19.81, "chg": 11.67, "amount_yi": 32.76, "mktcap_yi": 366.0, "turnover": 9.87, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-16", "break_gain": 11.67, "break_vol_ratio": 2.46, "days_after": 0, "ma5": 18.448, "ma10": 17.782, "ma20": 17.76, "ma55": 17.871, "dist_ma55_pct": 10.85, "vol_ratio_today": 2.46, "chg20": 11.79, "stop_tech": 17.335, "stop_tech_pct": -12.49, "stop_hard": 18.423, "target_233": 24.672, "recent_high": 20.88, "score": 59.0, "last_date": "2026-09-16"}, {"code": "300252", "name": "金信诺", "symbol": "sz300252", "amplitude": 3.6, "low_vs_ma55_pct": 4.13, "one_word": false, "limit_up": false, "limit_down": false, "industry": "电器行业", "ind_perf": 1.2696220017581, "price": 12.98, "chg": 2.45, "amount_yi": 6.33, "mktcap_yi": 88.8, "turnover": 8.79, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-11", "break_gain": 7.12, "break_vol_ratio": 2.01, "days_after": 3, "ma5": 12.844, "ma10": 12.608, "ma20": 12.192, "ma55": 12.11, "dist_ma55_pct": 7.18, "vol_ratio_today": 0.93, "chg20": 17.79, "stop_tech": 11.747, "stop_tech_pct": -9.5, "stop_hard": 12.071, "target_233": 14.073, "recent_high": 19.28, "score": 59.0, "last_date": "2026-09-16"}, {"code": "688225", "name": "亚信安全", "symbol": "sh688225", "amplitude": 4.6, "low_vs_ma55_pct": 2.75, "one_word": false, "limit_up": false, "limit_down": false, "industry": "", "ind_perf": null, "price": 12.98, "chg": -2.77, "amount_yi": 1.43, "mktcap_yi": 51.9, "turnover": 2.74, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-14", "break_gain": 10.4, "break_vol_ratio": 2.83, "days_after": 2, "ma5": 13.034, "ma10": 12.998, "ma20": 12.662, "ma55": 12.565, "dist_ma55_pct": 3.31, "vol_ratio_today": 1.11, "chg20": 9.72, "stop_tech": 12.188, "stop_tech_pct": -6.1, "stop_hard": 12.071, "target_233": 16.928, "recent_high": 15.47, "score": 58.0, "last_date": "2026-09-16"}, {"code": "603155", "name": "新亚强", "symbol": "sh603155", "amplitude": 12.1, "low_vs_ma55_pct": -4.76, "one_word": false, "limit_up": true, "limit_down": false, "industry": "", "ind_perf": null, "price": 15.4, "chg": 10.0, "amount_yi": 3.95, "mktcap_yi": 70.5, "turnover": 5.74, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-16", "break_gain": 10.0, "break_vol_ratio": 3.97, "days_after": 0, "ma5": 13.884, "ma10": 13.813, "ma20": 13.783, "ma55": 14.427, "dist_ma55_pct": 6.75, "vol_ratio_today": 3.97, "chg20": 11.43, "stop_tech": 13.74, "stop_tech_pct": -10.78, "stop_hard": 14.322, "target_233": 12.781, "recent_high": 21.13, "score": 55.0, "last_date": "2026-09-16"}, {"code": "688609", "name": "九联科技", "symbol": "sh688609", "amplitude": 12.3, "low_vs_ma55_pct": -1.93, "one_word": false, "limit_up": false, "limit_down": false, "industry": "", "ind_perf": null, "price": 9.86, "chg": 8.0, "amount_yi": 4.35, "mktcap_yi": 51.5, "turnover": 9.0, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-16", "break_gain": 8.0, "break_vol_ratio": 4.24, "days_after": 0, "ma5": 9.162, "ma10": 9.086, "ma20": 9.086, "ma55": 9.259, "dist_ma55_pct": 6.49, "vol_ratio_today": 4.24, "chg20": 10.91, "stop_tech": 8.981, "stop_tech_pct": -8.92, "stop_hard": 9.17, "target_233": 9.722, "recent_high": 11.6, "score": 55.0, "last_date": "2026-09-16"}, {"code": "688216", "name": "气派科技", "symbol": "sh688216", "amplitude": 9.2, "low_vs_ma55_pct": 12.66, "one_word": false, "limit_up": false, "limit_down": false, "industry": "", "ind_perf": null, "price": 39.39, "chg": 6.14, "amount_yi": 6.56, "mktcap_yi": 45.1, "turnover": 16.29, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-15", "break_gain": 15.93, "break_vol_ratio": 2.74, "days_after": 1, "ma5": 35.03, "ma10": 32.799, "ma20": 31.659, "ma55": 32.114, "dist_ma55_pct": 22.66, "vol_ratio_today": 1.64, "chg20": 29.36, "stop_tech": 31.151, "stop_tech_pct": -20.92, "stop_hard": 36.633, "target_233": 29.458, "recent_high": 51.3, "score": 53.0, "last_date": "2026-09-16"}, {"code": "688381", "name": "帝奥微", "symbol": "sh688381", "amplitude": 6.3, "low_vs_ma55_pct": 8.25, "one_word": false, "limit_up": false, "limit_down": false, "industry": "", "ind_perf": null, "price": 40.68, "chg": 4.12, "amount_yi": 4.66, "mktcap_yi": 100.7, "turnover": 4.74, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-14", "break_gain": 13.23, "break_vol_ratio": 2.25, "days_after": 2, "ma5": 38.224, "ma10": 37.53, "ma20": 35.978, "ma55": 35.352, "dist_ma55_pct": 15.07, "vol_ratio_today": 1.02, "chg20": 26.1, "stop_tech": 34.21, "stop_tech_pct": -15.9, "stop_hard": 37.832, "target_233": 30.101, "recent_high": 55.01, "score": 53.0, "last_date": "2026-09-16"}, {"code": "000510", "name": "新金路", "symbol": "sz000510", "amplitude": 3.2, "low_vs_ma55_pct": 4.21, "one_word": false, "limit_up": false, "limit_down": false, "industry": "化工行业", "ind_perf": 2.0330139224148, "price": 18.0, "chg": 0.73, "amount_yi": 6.13, "mktcap_yi": 116.7, "turnover": 5.64, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-15", "break_gain": 4.75, "break_vol_ratio": 1.69, "days_after": 1, "ma5": 17.136, "ma10": 17.071, "ma20": 17.018, "ma55": 16.84, "dist_ma55_pct": 6.89, "vol_ratio_today": 0.8, "chg20": 16.43, "stop_tech": 16.335, "stop_tech_pct": -9.25, "stop_hard": 16.74, "target_233": 14.52, "recent_high": 27.85, "score": 53.0, "last_date": "2026-09-16"}, {"code": "301589", "name": "诺瓦星云", "symbol": "sz301589", "amplitude": 5.5, "low_vs_ma55_pct": 3.76, "one_word": false, "limit_up": false, "limit_down": false, "industry": "", "ind_perf": null, "price": 153.18, "chg": 4.43, "amount_yi": 1.85, "mktcap_yi": 141.6, "turnover": 3.56, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-14", "break_gain": 5.14, "break_vol_ratio": 2.41, "days_after": 2, "ma5": 145.41, "ma10": 144.161, "ma20": 142.246, "ma55": 140.407, "dist_ma55_pct": 9.1, "vol_ratio_today": 1.93, "chg20": 10.2, "stop_tech": 136.195, "stop_tech_pct": -11.09, "stop_hard": 142.457, "target_233": 160.79, "recent_high": 153.68, "score": 53.0, "last_date": "2026-09-16"}, {"code": "688667", "name": "菱电电控", "symbol": "sh688667", "amplitude": 7.2, "low_vs_ma55_pct": -2.44, "one_word": false, "limit_up": false, "limit_down": false, "industry": "", "ind_perf": null, "price": 97.37, "chg": 5.05, "amount_yi": 1.06, "mktcap_yi": 51.3, "turnover": 2.12, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-16", "break_gain": 5.05, "break_vol_ratio": 1.55, "days_after": 0, "ma5": 94.808, "ma10": 93.59, "ma20": 91.316, "ma55": 93.721, "dist_ma55_pct": 3.89, "vol_ratio_today": 1.55, "chg20": 7.4, "stop_tech": 90.909, "stop_tech_pct": -6.64, "stop_hard": 90.554, "target_233": 93.405, "recent_high": 137.21, "score": 52.0, "last_date": "2026-09-16"}, {"code": "300522", "name": "世名科技", "symbol": "sz300522", "amplitude": 13.2, "low_vs_ma55_pct": -3.14, "one_word": false, "limit_up": false, "limit_down": false, "industry": "", "ind_perf": null, "price": 15.85, "chg": 10.76, "amount_yi": 5.71, "mktcap_yi": 51.1, "turnover": 14.41, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-16", "break_gain": 10.76, "break_vol_ratio": 2.94, "days_after": 0, "ma5": 14.396, "ma10": 14.027, "ma20": 13.99, "ma55": 14.495, "dist_ma55_pct": 9.35, "vol_ratio_today": 2.94, "chg20": 13.78, "stop_tech": 14.04, "stop_tech_pct": -11.42, "stop_hard": 14.74, "target_233": 13.535, "recent_high": 25.6, "score": 48.0, "last_date": "2026-09-16"}, {"code": "605366", "name": "宏柏新材", "symbol": "sh605366", "amplitude": 9.9, "low_vs_ma55_pct": -4.8, "one_word": false, "limit_up": false, "limit_down": false, "industry": "", "ind_perf": null, "price": 8.66, "chg": 7.05, "amount_yi": 2.96, "mktcap_yi": 66.9, "turnover": 4.52, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-16", "break_gain": 7.05, "break_vol_ratio": 1.6, "days_after": 0, "ma5": 8.214, "ma10": 8.113, "ma20": 8.051, "ma55": 8.382, "dist_ma55_pct": 3.32, "vol_ratio_today": 1.6, "chg20": 8.79, "stop_tech": 7.98, "stop_tech_pct": -7.85, "stop_hard": 8.054, "target_233": 8.855, "recent_high": 14.9, "score": 47.0, "last_date": "2026-09-16"}, {"code": "688383", "name": "新益昌", "symbol": "sh688383", "amplitude": 5.4, "low_vs_ma55_pct": 9.5, "one_word": false, "limit_up": false, "limit_down": false, "industry": "", "ind_perf": null, "price": 142.72, "chg": 2.57, "amount_yi": 3.73, "mktcap_yi": 145.1, "turnover": 2.6, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-14", "break_gain": 16.55, "break_vol_ratio": 1.99, "days_after": 2, "ma5": 135.128, "ma10": 132.549, "ma20": 129.328, "ma55": 125.185, "dist_ma55_pct": 14.01, "vol_ratio_today": 0.8, "chg20": 17.77, "stop_tech": 117.3, "stop_tech_pct": -17.81, "stop_hard": 132.73, "target_233": 99.564, "recent_high": 205.0, "score": 47.0, "last_date": "2026-09-16"}, {"code": "688625", "name": "呈和科技", "symbol": "sh688625", "amplitude": 7.9, "low_vs_ma55_pct": 12.65, "one_word": false, "limit_up": false, "limit_down": false, "industry": "", "ind_perf": null, "price": 70.41, "chg": 4.68, "amount_yi": 8.65, "mktcap_yi": 182.8, "turnover": 4.8, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-14", "break_gain": 7.92, "break_vol_ratio": 1.79, "days_after": 2, "ma5": 63.13, "ma10": 59.251, "ma20": 57.17, "ma55": 59.225, "dist_ma55_pct": 18.88, "vol_ratio_today": 1.84, "chg20": 22.94, "stop_tech": 55.8, "stop_tech_pct": -20.75, "stop_hard": 65.481, "target_233": 49.265, "recent_high": 95.88, "score": 47.0, "last_date": "2026-09-16"}, {"code": "300820", "name": "英杰电气", "symbol": "sz300820", "amplitude": 9.3, "low_vs_ma55_pct": 9.5, "one_word": false, "limit_up": false, "limit_down": false, "industry": "", "ind_perf": null, "price": 67.6, "chg": 12.72, "amount_yi": 9.69, "mktcap_yi": 150.2, "turnover": 13.21, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-15", "break_gain": 4.73, "break_vol_ratio": 1.59, "days_after": 1, "ma5": 59.602, "ma10": 58.483, "ma20": 56.422, "ma55": 56.622, "dist_ma55_pct": 19.39, "vol_ratio_today": 3.34, "chg20": 28.4, "stop_tech": 54.924, "stop_tech_pct": -18.75, "stop_hard": 62.868, "target_233": 55.711, "recent_high": 93.33, "score": 47.0, "last_date": "2026-09-16"}, {"code": "301071", "name": "力量钻石", "symbol": "sz301071", "amplitude": 5.9, "low_vs_ma55_pct": 3.5, "one_word": false, "limit_up": false, "limit_down": false, "industry": "", "ind_perf": null, "price": 69.44, "chg": 5.21, "amount_yi": 18.64, "mktcap_yi": 176.7, "turnover": 14.58, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-14", "break_gain": 9.1, "break_vol_ratio": 1.55, "days_after": 2, "ma5": 64.694, "ma10": 63.497, "ma20": 61.452, "ma55": 63.43, "dist_ma55_pct": 9.48, "vol_ratio_today": 1.07, "chg20": 16.2, "stop_tech": 57.71, "stop_tech_pct": -16.89, "stop_hard": 64.579, "target_233": 51.763, "recent_high": 106.31, "score": 47.0, "last_date": "2026-09-16"}, {"code": "301389", "name": "隆扬电子", "symbol": "sz301389", "amplitude": 4.7, "low_vs_ma55_pct": 6.88, "one_word": false, "limit_up": false, "limit_down": false, "industry": "", "ind_perf": null, "price": 61.67, "chg": -0.19, "amount_yi": 7.41, "mktcap_yi": 174.8, "turnover": 4.26, "stage": "WATCH", "hit_kind": "", "hit_date": "", "hit_vol_ratio": null, "reclaim": false, "break_date": "2026-09-15", "break_gain": 8.54, "break_vol_ratio": 1.85, "days_after": 1, "ma5": 58.608, "ma10": 57.438, "ma20": 56.943, "ma55": 56.234, "dist_ma55_pct": 9.67, "vol_ratio_today": 1.3, "chg20": 16.29, "stop_tech": 54.547, "stop_tech_pct": -11.55, "stop_hard": 57.353, "target_233": 59.637, "recent_high": 102.6, "score": 47.0, "last_date": "2026-09-16"}], "stats": {"buy_today": 6, "buy_recent": 1, "watch": 25, "scanned": 5219}};
+</script>
+<script>
+(function(){
+  var D = window.__DATA__ || {};
+  var M = D.meta || {}, S = D.stats || {}, cfg = (M.config||{});
+  document.getElementById('gen').textContent =
+    '交易日 ' + (M.trade_date||'-') + ' · 生成 ' + (M.generated||'-') +
+    ' · 扫描 ' + (S.scanned||0) + '/' + (M.universe||0) + ' 只';
+
+  // 大盘环境
+  var m = M.market || {};
+  var envCls = m.tag === '多头强势' ? 'strong' : (m.tag === '弱势' ? 'weak' : 'mid');
+  document.getElementById('env').innerHTML =
+    '<span class="tag '+envCls+'">大盘：'+(m.tag||'未知')+'</span>'+
+    '<span class="desc">'+(m.desc||'')+'</span>'+
+    '<span class="num">上证 '+(m.close||'-')+' <span class="'+(m.chg>=0?'up':'down')+'">'+
+      (m.chg>=0?'+':'')+(m.chg||0)+'%</span> · MA55='+(m.ma55||'-')+'</span>';
+
+  if (m.tag === '弱势' || m.tag === '修复中') {
+    document.getElementById('warn').innerHTML =
+      '<div class="warnbar">⚠️ 当前大盘为「'+(m.tag||'')+'」——他 09-10 明确说过「大盘大趋势影响个股小趋势，'+
+      '趋势战法胜率有所下降，除非图形特别好看都谨慎开仓」。本页信号请降级使用。</div>';
+  }
+
+  var GROUPS = [
+    {key:'buy_today',  cls:'today',  label:'🔥 今日买点',      hint:'最后一根K线（'+((M.trade_date)||'')+'）命中回踩：盘中击穿/触及 55 线'},
+    {key:'buy_recent', cls:'recent', label:'⏳ 窗口内已触发',  hint:'突破后 1~3 天内触发过回踩，但今天没再触发（可能已错过那一脚）'},
+    {key:'watch',      cls:'watch',  label:'👀 待回踩观察',    hint:'已放量突破日 55 线，尚未回踩到位，等它给那一脚'}
+  ];
+  var cur = 'buy_today';
+
+  function pct(v){ return (v>=0?'+':'') + (v==null?'-':v) + '%'; }
+  function cls(v){ return v>=0 ? 'up' : 'down'; }
+  function esc(s){ return String(s==null?'':s).replace(/[<>&"]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];}); }
+
+  function renderPills(){
+    document.getElementById('pills').innerHTML = GROUPS.map(function(g){
+      var n = (D[g.key]||[]).length;
+      var extra = ({buy_today:'hot',buy_recent:'warn',watch:'watch'})[g.key];
+      return '<div class="pill '+extra+(cur===g.key?' on':'')+'" data-k="'+g.key+'">'+
+        esc(g.label)+' <b>'+n+'</b></div>';
+    }).join('');
+    Array.prototype.forEach.call(document.querySelectorAll('.pill'), function(el){
+      el.onclick = function(){ cur = el.getAttribute('data-k'); renderPills(); renderList(); };
+    });
+  }
+
+  function renderList(){
+    var g = GROUPS.filter(function(x){return x.key===cur;})[0];
+    var arr = D[cur] || [];
+    var box = document.getElementById('list');
+    if (!arr.length){ box.innerHTML = '<div class="card"><div class="empty">本组暂无命中</div></div>'; return; }
+    box.innerHTML = arr.map(function(r){
+      var hit = r.hit_kind || '';
+      var hc = hit.indexOf('A')===0 ? 'a' : (hit.indexOf('B')===0 ? 'b' : (hit?'c':''));
+      return '<div class="item '+g.cls+'">'+
+        '<div class="hd"><span class="nm">'+esc(r.name)+'</span><span class="cd">'+esc(r.code)+'</span>'+
+          '<span class="score">评分 '+r.score+'</span></div>'+
+        '<div class="row">'+
+          '<span class="kv">现价 <b>'+r.price+'</b> <span class="'+cls(r.chg)+'">'+pct(r.chg)+'</span></span>'+
+          '<span class="kv">收盘距55线 <b class="'+cls(r.dist_ma55_pct)+'">'+pct(r.dist_ma55_pct)+'</b></span>'+
+          '<span class="kv">最低距55线 <b class="'+cls(r.low_vs_ma55_pct)+'">'+pct(r.low_vs_ma55_pct)+'</b></span>'+
+          '<span class="kv">MA55 <b>'+r.ma55+'</b></span>'+
+        '</div>'+
+        '<div class="row">'+
+          '<span class="chip">'+esc(r.industry||'未分类')+(r.ind_perf!=null?' '+pct(r.ind_perf):'')+'</span>'+
+          '<span class="chip">市值'+(r.mktcap_yi>=10000?(r.mktcap_yi/10000).toFixed(1)+'万亿':r.mktcap_yi+'亿')+'</span>'+
+          '<span class="chip">成交'+r.amount_yi+'亿</span>'+
+          '<span class="chip">换手'+r.turnover+'%</span>'+
+          (r.amplitude>=15?'<span class="chip c">振幅'+r.amplitude+'% ⚠️</span>':'<span class="chip">振幅'+r.amplitude+'%</span>')+
+          (r.one_word?'<span class="chip c">一字板</span>':'')+
+          (r.limit_up?'<span class="chip c">今日涨停·买不到</span>':'')+
+          (r.limit_down?'<span class="chip a">今日跌停</span>':'')+
+        '</div>'+
+        '<div class="line"></div>'+
+        '<div class="row">'+
+          '<span class="kv">突破 <b>'+esc(r.break_date)+'</b></span>'+
+          '<span class="kv">涨幅 <b class="up">+'+r.break_gain+'%</b></span>'+
+          '<span class="kv">量比 <b>'+r.break_vol_ratio+'</b></span>'+
+          '<span class="kv">第<b>'+r.days_after+'</b>天</span>'+
+          (r.stage==='WATCH' && r.days_after>=3 ? '<span class="chip c">窗口最后一天·明天就不算了</span>' : '')+
+          (r.stage==='WATCH' && r.days_after===0 ? '<span class="chip b">今日刚突破·等明天回踩</span>' : '')+
+        '</div>'+
+        (hit ? '<div class="row"><span class="kv">回踩 <b>'+esc(r.hit_date)+'</b></span>'+
+          '<span class="chip '+hc+'">'+esc(hit)+'</span>'+
+          '<span class="kv">回踩量比 <b>'+r.hit_vol_ratio+'</b></span>'+
+          (r.reclaim?'<span class="chip a">收回55线上</span>':'')+'</div>' : '')+
+        '<div class="row">'+
+          '<span class="kv">技术止损 <b class="down">'+r.stop_tech+'</b> ('+pct(r.stop_tech_pct)+')</span>'+
+          '<span class="kv">硬止损 <b>'+r.stop_hard+'</b></span>'+
+        '</div>'+
+        '<div class="row">'+
+          '<span class="kv">目标 日233 <b>'+(r.target_233||'-')+'</b></span>'+
+          '<span class="kv">前高 <b>'+r.recent_high+'</b></span>'+
+          '<span class="kv">20日 <b class="'+cls(r.chg20)+'">'+pct(r.chg20)+'</b></span>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+    box.insertAdjacentHTML('beforeend',
+      '<div class="card" style="grid-column:1/-1"><div class="hint">'+esc(g.hint)+'</div></div>');
+  }
+
+  // 参数表
+  var par = [['多头排列', (cfg.trend&&cfg.trend.bull_ma||[]).join('/')],
+    ['信号线', 'MA'+(cfg.trend&&cfg.trend.signal_ma)],
+    ['突破涨幅≥', (cfg.breakout&&cfg.breakout.min_gain_pct)+'%'],
+    ['突破量比≥', (cfg.breakout&&cfg.breakout.min_vol_ratio)],
+    ['突破窗口', (cfg.breakout&&cfg.breakout.lookback_days)+' 天'],
+    ['回踩窗口', (cfg.pullback&&cfg.pullback.max_days_after)+' 天'],
+    ['回踩缩量≤', (cfg.pullback&&cfg.pullback.shrink_vol_ratio)+'倍均量'],
+    ['止损 距MA55', (cfg.risk&&cfg.risk.stop_below_ma55_pct)+'%'],
+    ['硬止损', (cfg.risk&&cfg.risk.hard_stop_pct)+'%'],
+    ['最小成交额', (cfg.universe&&cfg.universe.min_amount_yi)+'亿']];
+  document.getElementById('par').innerHTML = par.map(function(x){
+    return '<tr><td>'+esc(x[0])+'</td><td>'+esc(x[1])+'</td></tr>'; }).join('');
+  var ic = document.getElementById('indcov');
+  if (ic) ic.textContent = (M.industry_cover||0) + ' / ' + (M.universe||0);
+
+  renderPills(); renderList();
+})();
+</script>
+</body>
+</html>
