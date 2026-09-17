@@ -1,0 +1,58 @@
+name: lance55 每日扫盘
+
+# 只在定时 / 手动时触发。push 不触发，避免改代码就重跑一遍。
+on:
+  schedule:
+    # 15:20 北京时间（= 07:20 UTC），周一到周五。A股 15:00 收盘，留 20 分钟等数据落定。
+    - cron: '20 7 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# 同一时间只允许一个实例，避免两个 run 互相盖提交
+concurrency:
+  group: lance55-scan
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: 拉取仓库
+        uses: actions/checkout@v4
+
+      - name: 准备 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 运行扫盘引擎（零依赖）
+        run: python lance55_scan.py 2>&1 | tee run.log
+
+      - name: 数据校验（不合格就中止，线上保持上一版）
+        run: python guard.py
+
+      - name: 生成单文件看板
+        run: python build_single.py index.html
+
+      - name: 提交并推送
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html data.json
+          if git diff --cached --quiet; then
+            echo "内容无变化，跳过提交"
+          else
+            git commit -m "scan: $(TZ=Asia/Shanghai date +%Y-%m-%d)"
+            git push
+          fi
+
+      - name: 失败时留下日志（便于远程排查）
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: run-log
+          path: run.log
+          if-no-files-found: ignore
