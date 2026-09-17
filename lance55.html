@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>55战法扫盘 · 兰斯洛t</title>
+<style>
+:root{
+  --bg:#f5f6f8; --card:#fff; --line:#e5e7eb; --txt:#1f2328; --sub:#6b7280;
+  --up:#e02020; --down:#0a9d4e; --hot:#e8500f; --blue:#2563eb; --amber:#d97706;
+  --soft:#f0f2f5;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:16px 14px 60px}
+h1{font-size:20px;margin:0 0 2px}
+.sub{color:var(--sub);font-size:12px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.env{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.env .tag{font-weight:700;font-size:15px;padding:3px 10px;border-radius:8px;background:var(--soft)}
+.env .tag.weak{color:var(--down)}.env .tag.mid{color:var(--amber)}.env .tag.strong{color:var(--up)}
+.env .desc{color:var(--sub);font-size:13px;flex:1 1 320px}
+.env .num{font-variant-numeric:tabular-nums;font-size:13px;color:var(--sub)}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.pill{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer;user-select:none}
+.pill.on{border-color:var(--txt);font-weight:700}
+.pill b{font-variant-numeric:tabular-nums}
+.pill.hot.on{background:#fff3ec;border-color:var(--hot);color:var(--hot)}
+.pill.warn.on{background:#fff8e6;border-color:var(--amber);color:var(--amber)}
+.pill.watch.on{background:#eef2ff;border-color:var(--blue);color:var(--blue)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 13px;position:relative}
+.item.today{border-left:4px solid var(--hot)}
+.item.recent{border-left:4px solid var(--amber)}
+.item.watch{border-left:4px solid var(--blue)}
+.hd{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.hd .nm{font-size:16px;font-weight:700}
+.hd .cd{color:var(--sub);font-size:12px;font-variant-numeric:tabular-nums}
+.hd .score{margin-left:auto;font-size:12px;background:var(--soft);border-radius:8px;padding:2px 7px;font-variant-numeric:tabular-nums}
+.row{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:7px;font-size:13px}
+.kv{color:var(--sub)}
+.kv b{color:var(--txt);font-weight:600;font-variant-numeric:tabular-nums}
+.up{color:var(--up)}.down{color:var(--down)}
+.chip{font-size:11.5px;padding:2px 7px;border-radius:6px;background:var(--soft);color:var(--sub)}
+.chip.a{background:#e8f5ee;color:var(--down)}
+.chip.b{background:#eef2ff;color:var(--blue)}
+.chip.c{background:#fdeaea;color:var(--up)}
+.line{height:1px;background:var(--line);margin:9px 0}
+.hint{font-size:12px;color:var(--sub);margin-top:6px;line-height:1.6}
+details{margin-top:6px}
+summary{cursor:pointer;font-size:13px;color:var(--blue);outline:none}
+.rule{font-size:13px;color:#374151;line-height:1.75}
+.rule code{background:var(--soft);padding:1px 5px;border-radius:4px;font-size:12px}
+.empty{color:var(--sub);padding:26px 10px;text-align:center;font-size:13px}
+.crumb{font-size:12px;color:var(--sub);margin:14px 0 6px;font-weight:600}
+table.par{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+table.par td{border-top:1px solid var(--line);padding:4px 6px;color:var(--sub)}
+table.par td:last-child{text-align:right;color:var(--txt);font-variant-numeric:tabular-nums}
+.warnbar{background:#fff8e6;border:1px solid #f5d68a;color:#8a5a00;border-radius:10px;padding:9px 12px;font-size:12.5px;margin-bottom:12px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>55 战法扫盘 <span style="font-size:13px;font-weight:400;color:#6b7280">· 兰斯洛t</span></h1>
+  <div class="sub" id="gen">加载中…</div>
+
+  <div class="card"><div class="env" id="env"></div></div>
+  <div id="warn"></div>
+
+  <div class="stats" id="pills"></div>
+  <div class="grid" id="list"></div>
+
+  <div class="crumb">战法速查（兰神原话归纳）</div>
+  <div class="card">
+    <details open>
+      <summary>开仓 / 买点 / 卖点 / 止损</summary>
+      <div class="rule" style="margin-top:8px">
+        <b>① 前提</b>：<code>5/10/20 多头排列</code>（他原话：多头排列最重要，55 线都其次）<br>
+        <b>② 触发</b>：以<b>放量大阳K</b>突破日 55 线（跟个股自己均量比即可）<br>
+        <b>③ 买点</b>：突破后 <b>1~3 天内</b>（最好第 2 天，最多第 3 天）<br>
+        &nbsp;&nbsp;· <b>A 类</b>：开盘被快速向下击穿 55 线（大盘同步跌最好）→ <b>当天收回 55 线上最强</b><br>
+        &nbsp;&nbsp;· <b>B 类</b>：尾盘落在 55 线下且当天<b>缩量</b><br>
+        <b>④ 卖点（盈亏同源）</b>：在<b>上一级别 55 线</b>卖 —— 日线买 → 日 233 / 周 55；60 分买 → 日 55<br>
+        <b>⑤ 做 T</b>：优先 <b>15 分 55 线</b>，一次 T 1/3，别 T 飞底仓<br>
+        <b>⑥ 止损</b>：<b>凌驾于任何技术之上</b>。放量击穿 55 收不回来 → 减仓/清仓；超定量止损上限 → 直接跑<br>
+        <b>⑦ 环境</b>：大盘是最大趋势。大盘跌 + 个股跌时抄，胜率最高；大盘不企稳开仓赚不到钱
+      </div>
+    </details>
+    <details>
+      <summary>本次扫描参数（改 lance55_config.json 后重跑即可）</summary>
+      <table class="par" id="par"></table>
+    </details>
+    <div class="hint">
+      数据口径：腾讯前复权日线（含当日实时）× 沪深 A 股（不含北交所、ST、退市）。<br>
+      「A 类 / B 类」由日线近似判定：日线看不到分时速度，A 类仅表示<b>收盘收回 55 线上</b>。<br>
+      行业覆盖 <b id="indcov">-</b> 只（新浪行业板块接口只覆盖约六成，其余标"未分类"，不是数据缺失）。<br>
+      「回踩」判定含 <b>0.5% 容差</b>（最低价触及 MA55×1.005 即算）——所以请看「最低距55线」那一栏，
+      <b>负值=真击穿，正值=只是贴近</b>。标注 <b>C 类</b> 表示收盘落在 55 线下且<b>放量</b>（他原则里的减仓/离场信号），谨慎对待。<br>
+      高振幅(≥15%)、一字板、今日涨停的会单独标注——这些要么是妖股要么买不到，别当普通信号用。<br>
+      他自称的胜率(100%/78%)<b>未经独立验证</b>；此为观测与筛选工具，不构成投资建议。
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+(function(){
+  var D = window.__DATA__ || {};
+  var M = D.meta || {}, S = D.stats || {}, cfg = (M.config||{});
+  document.getElementById('gen').textContent =
+    '交易日 ' + (M.trade_date||'-') + ' · 生成 ' + (M.generated||'-') +
+    ' · 扫描 ' + (S.scanned||0) + '/' + (M.universe||0) + ' 只';
+
+  // 大盘环境
+  var m = M.market || {};
+  var envCls = m.tag === '多头强势' ? 'strong' : (m.tag === '弱势' ? 'weak' : 'mid');
+  document.getElementById('env').innerHTML =
+    '<span class="tag '+envCls+'">大盘：'+(m.tag||'未知')+'</span>'+
+    '<span class="desc">'+(m.desc||'')+'</span>'+
+    '<span class="num">上证 '+(m.close||'-')+' <span class="'+(m.chg>=0?'up':'down')+'">'+
+      (m.chg>=0?'+':'')+(m.chg||0)+'%</span> · MA55='+(m.ma55||'-')+'</span>';
+
+  if (m.tag === '弱势' || m.tag === '修复中') {
+    document.getElementById('warn').innerHTML =
+      '<div class="warnbar">⚠️ 当前大盘为「'+(m.tag||'')+'」——他 09-10 明确说过「大盘大趋势影响个股小趋势，'+
+      '趋势战法胜率有所下降，除非图形特别好看都谨慎开仓」。本页信号请降级使用。</div>';
+  }
+
+  var GROUPS = [
+    {key:'buy_today',  cls:'today',  label:'🔥 今日买点',      hint:'最后一根K线（'+((M.trade_date)||'')+'）命中回踩：盘中击穿/触及 55 线'},
+    {key:'buy_recent', cls:'recent', label:'⏳ 窗口内已触发',  hint:'突破后 1~3 天内触发过回踩，但今天没再触发（可能已错过那一脚）'},
+    {key:'watch',      cls:'watch',  label:'👀 待回踩观察',    hint:'已放量突破日 55 线，尚未回踩到位，等它给那一脚'}
+  ];
+  var cur = 'buy_today';
+
+  function pct(v){ return (v>=0?'+':'') + (v==null?'-':v) + '%'; }
+  function cls(v){ return v>=0 ? 'up' : 'down'; }
+  function esc(s){ return String(s==null?'':s).replace(/[<>&"]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];}); }
+
+  function renderPills(){
+    document.getElementById('pills').innerHTML = GROUPS.map(function(g){
+      var n = (D[g.key]||[]).length;
+      var extra = ({buy_today:'hot',buy_recent:'warn',watch:'watch'})[g.key];
+      return '<div class="pill '+extra+(cur===g.key?' on':'')+'" data-k="'+g.key+'">'+
+        esc(g.label)+' <b>'+n+'</b></div>';
+    }).join('');
+    Array.prototype.forEach.call(document.querySelectorAll('.pill'), function(el){
+      el.onclick = function(){ cur = el.getAttribute('data-k'); renderPills(); renderList(); };
+    });
+  }
+
+  function renderList(){
+    var g = GROUPS.filter(function(x){return x.key===cur;})[0];
+    var arr = D[cur] || [];
+    var box = document.getElementById('list');
+    if (!arr.length){ box.innerHTML = '<div class="card"><div class="empty">本组暂无命中</div></div>'; return; }
+    box.innerHTML = arr.map(function(r){
+      var hit = r.hit_kind || '';
+      var hc = hit.indexOf('A')===0 ? 'a' : (hit.indexOf('B')===0 ? 'b' : (hit?'c':''));
+      return '<div class="item '+g.cls+'">'+
+        '<div class="hd"><span class="nm">'+esc(r.name)+'</span><span class="cd">'+esc(r.code)+'</span>'+
+          '<span class="score">评分 '+r.score+'</span></div>'+
+        '<div class="row">'+
+          '<span class="kv">现价 <b>'+r.price+'</b> <span class="'+cls(r.chg)+'">'+pct(r.chg)+'</span></span>'+
+          '<span class="kv">收盘距55线 <b class="'+cls(r.dist_ma55_pct)+'">'+pct(r.dist_ma55_pct)+'</b></span>'+
+          '<span class="kv">最低距55线 <b class="'+cls(r.low_vs_ma55_pct)+'">'+pct(r.low_vs_ma55_pct)+'</b></span>'+
+          '<span class="kv">MA55 <b>'+r.ma55+'</b></span>'+
+        '</div>'+
+        '<div class="row">'+
+          '<span class="chip">'+esc(r.industry||'未分类')+(r.ind_perf!=null?' '+pct(r.ind_perf):'')+'</span>'+
+          '<span class="chip">市值'+(r.mktcap_yi>=10000?(r.mktcap_yi/10000).toFixed(1)+'万亿':r.mktcap_yi+'亿')+'</span>'+
+          '<span class="chip">成交'+r.amount_yi+'亿</span>'+
+          '<span class="chip">换手'+r.turnover+'%</span>'+
+          (r.amplitude>=15?'<span class="chip c">振幅'+r.amplitude+'% ⚠️</span>':'<span class="chip">振幅'+r.amplitude+'%</span>')+
+          (r.one_word?'<span class="chip c">一字板</span>':'')+
+          (r.limit_up?'<span class="chip c">今日涨停·买不到</span>':'')+
+          (r.limit_down?'<span class="chip a">今日跌停</span>':'')+
+        '</div>'+
+        '<div class="line"></div>'+
+        '<div class="row">'+
+          '<span class="kv">突破 <b>'+esc(r.break_date)+'</b></span>'+
+          '<span class="kv">涨幅 <b class="up">+'+r.break_gain+'%</b></span>'+
+          '<span class="kv">量比 <b>'+r.break_vol_ratio+'</b></span>'+
+          '<span class="kv">第<b>'+r.days_after+'</b>天</span>'+
+          (r.stage==='WATCH' && r.days_after>=3 ? '<span class="chip c">窗口最后一天·明天就不算了</span>' : '')+
+          (r.stage==='WATCH' && r.days_after===0 ? '<span class="chip b">今日刚突破·等明天回踩</span>' : '')+
+        '</div>'+
+        (hit ? '<div class="row"><span class="kv">回踩 <b>'+esc(r.hit_date)+'</b></span>'+
+          '<span class="chip '+hc+'">'+esc(hit)+'</span>'+
+          '<span class="kv">回踩量比 <b>'+r.hit_vol_ratio+'</b></span>'+
+          (r.reclaim?'<span class="chip a">收回55线上</span>':'')+'</div>' : '')+
+        '<div class="row">'+
+          '<span class="kv">技术止损 <b class="down">'+r.stop_tech+'</b> ('+pct(r.stop_tech_pct)+')</span>'+
+          '<span class="kv">硬止损 <b>'+r.stop_hard+'</b></span>'+
+        '</div>'+
+        '<div class="row">'+
+          '<span class="kv">目标 日233 <b>'+(r.target_233||'-')+'</b></span>'+
+          '<span class="kv">前高 <b>'+r.recent_high+'</b></span>'+
+          '<span class="kv">20日 <b class="'+cls(r.chg20)+'">'+pct(r.chg20)+'</b></span>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+    box.insertAdjacentHTML('beforeend',
+      '<div class="card" style="grid-column:1/-1"><div class="hint">'+esc(g.hint)+'</div></div>');
+  }
+
+  // 参数表
+  var par = [['多头排列', (cfg.trend&&cfg.trend.bull_ma||[]).join('/')],
+    ['信号线', 'MA'+(cfg.trend&&cfg.trend.signal_ma)],
+    ['突破涨幅≥', (cfg.breakout&&cfg.breakout.min_gain_pct)+'%'],
+    ['突破量比≥', (cfg.breakout&&cfg.breakout.min_vol_ratio)],
+    ['突破窗口', (cfg.breakout&&cfg.breakout.lookback_days)+' 天'],
+    ['回踩窗口', (cfg.pullback&&cfg.pullback.max_days_after)+' 天'],
+    ['回踩缩量≤', (cfg.pullback&&cfg.pullback.shrink_vol_ratio)+'倍均量'],
+    ['止损 距MA55', (cfg.risk&&cfg.risk.stop_below_ma55_pct)+'%'],
+    ['硬止损', (cfg.risk&&cfg.risk.hard_stop_pct)+'%'],
+    ['最小成交额', (cfg.universe&&cfg.universe.min_amount_yi)+'亿']];
+  document.getElementById('par').innerHTML = par.map(function(x){
+    return '<tr><td>'+esc(x[0])+'</td><td>'+esc(x[1])+'</td></tr>'; }).join('');
+  var ic = document.getElementById('indcov');
+  if (ic) ic.textContent = (M.industry_cover||0) + ' / ' + (M.universe||0);
+
+  renderPills(); renderList();
+})();
+</script>
+</body>
+</html>
