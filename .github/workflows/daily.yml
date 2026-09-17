@@ -28,8 +28,15 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: 清掉上一次的产物（避免拿旧 data.json 误判通过）
+        run: rm -f data.json
+
       - name: 运行扫盘引擎（零依赖）
-        run: python lance55_scan.py 2>&1 | tee run.log
+        shell: bash
+        # pipefail：不写的话 tee 会吞掉 python 的失败状态，扫描崩了这步也算成功
+        run: |
+          set -o pipefail
+          python lance55_scan.py 2>&1 | tee run.log
 
       - name: 数据校验（不合格就中止，线上保持上一版）
         run: python guard.py
