@@ -1,0 +1,51 @@
+{
+  "_说明": "55战法扫盘配置。改阈值只动这里，不用改 Python 源码。",
+
+  "universe": {
+    "exclude_bj": true,
+    "exclude_name_keywords": ["ST", "退", "N "],
+    "min_bars": 60,
+    "min_amount_yi": 0.5,
+    "max_price": 200
+  },
+
+  "trend": {
+    "bull_ma": [5, 10, 20],
+    "signal_ma": 55,
+    "target_ma": 233,
+    "vol_ma": 5
+  },
+
+  "breakout": {
+    "_说明": "放量大阳突破日55线：前一日收盘在55线下，当日收盘站上，涨幅达标，量能达标",
+    "min_gain_pct": 3.0,
+    "min_vol_ratio": 1.5,
+    "require_yang": true,
+    "lookback_days": 3
+  },
+
+  "pullback": {
+    "_说明": "突破后1-3天内出现回踩：盘中击穿55线(low<=ma55*buf) 或 尾盘缩量落在55线下",
+    "max_days_after": 3,
+    "touch_buf": 0.005,
+    "shrink_vol_ratio": 1.0,
+    "max_close_below_pct": 3.0,
+    "reclaim_bonus": true
+  },
+
+  "risk": {
+    "_说明": "止损：突破日最低价 与 ma55*(1-stop_below) 取更低者；定量止损优先于技术",
+    "stop_below_ma55_pct": 3.0,
+    "hard_stop_pct": 7.0,
+    "max_chg20_pct": 80
+  },
+
+  "scan": {
+    "_说明": "rate 是全局每秒请求上限。实测 6 并发打到 ~50 req/s 会被腾讯 WAF 封 IP(501)，12 是安全线，别调高",
+    "top_n": 80,
+    "workers": 4,
+    "rate": 12,
+    "datalen": 320,
+    "industry": true
+  }
+}
