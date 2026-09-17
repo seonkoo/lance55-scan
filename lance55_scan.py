@@ -25,7 +25,14 @@ import threading
 import urllib.request
 import urllib.parse
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+
+CST = timezone(timedelta(hours=8))
+
+
+def now_cst():
+    """统一用北京时间。GitHub Actions 跑在 UTC，直接 datetime.now() 会差 8 小时。"""
+    return datetime.now(CST)
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -48,7 +55,7 @@ LOGS = []
 
 
 def log(msg):
-    line = "[%s] %s" % (datetime.now().strftime("%H:%M:%S"), msg)
+    line = "[%s] %s" % (now_cst().strftime("%H:%M:%S"), msg)
     LOGS.append(line)
     print(line, flush=True)
 
@@ -605,7 +612,7 @@ def main():
     log("=== 55战法扫盘 开始 ===")
     uni, trade_date = fetch_universe()
     if not trade_date:
-        trade_date = datetime.now().strftime("%Y-%m-%d")
+        trade_date = now_cst().strftime("%Y-%m-%d")
         log("  交易日取实时失败，回退为系统日期 %s" % trade_date)
 
     ind_of, perf = ({}, {})
@@ -682,7 +689,7 @@ def main():
 
     out = {
         "meta": {
-            "generated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "generated": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
             "trade_date": trade_date,
             "universe": len(uni),
             "scanned": n_valid,
